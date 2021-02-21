@@ -58,6 +58,8 @@ namespace FromTund
                 }
                 
             }
+
+            KatBox.Items.Clear();
             conn.open();
             string kat = "Select kat_nimi from kategoria";
             List<string[]> katt = conn.SelectOne(kat);
