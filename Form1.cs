@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -17,6 +18,7 @@ namespace FromTund
         SQLConnection conn = new SQLConnection();
         ShowFullData showData = new ShowFullData();
         Resourse set = new Resourse();
+        OpenFile file = new OpenFile();
 
         public Form1()
         {
@@ -32,7 +34,7 @@ namespace FromTund
             HindBox.Text = dataGridView1.Rows[e.RowIndex].Cells[3].Value.ToString();  
             if (dataGridView1.Rows[e.RowIndex].Cells[4].Value.ToString()=="")
             {
-                string pilt = "None";
+                string pilt = "none.png";
                 PiltBox.Image = Image.FromFile(set.GetResourcesFolder()+pilt);
             }
             else
@@ -76,14 +78,17 @@ namespace FromTund
                 }
                 
             }
+
+            PiltBox.Tag = "none.png";
         }
 
         private void AddButton_Click(object sender, EventArgs e) //Кнопка Добавления
         {
             conn.open();
             int KatInd = KatBox.SelectedIndex + 1;
+            string tag = PiltBox.Tag.ToString();
             string command = "INSERT INTO Tooded(Nimetus, Kogus, Hind, Pilt,kategoria_id) VALUES('" + this.NimetusBox.Text + "','" +
-                             this.KogusBox.Text + "','" + this.HindBox.Text + "','" + this.PiltBox.Text + "','"+KatInd+"');";
+                             this.KogusBox.Text + "','" + this.HindBox.Text + "','" + tag + "','"+KatInd+"');";
             conn.Select(command);
             conn.close();
             dataGridView1.Rows.Clear();
@@ -133,15 +138,37 @@ namespace FromTund
         {
           
         }
-
-        private void button2_Click(object sender, EventArgs e) //Кнопка доавить Картинку
+        private void button3_Click(object sender, EventArgs e) //Кнопка Обновить
         {
+            conn.open();
+            int KatInd = KatBox.SelectedIndex + 1;
+            string tag = PiltBox.Tag.ToString();
+            string command = "UPDATE Tooded SET Nimetus= '"+this.NimetusBox.Text+"';", Kogus='"+
+                             this.KogusBox.Text + "';", Hind='" +this.HindBox.Text +"';", Pilt='" + tag + "';",kategoria_id='"+KatInd+"';";
+            conn.Select(command);
+            conn.close();
+            dataGridView1.Rows.Clear();
+            List<string[]> data = showData.show();
+            foreach (string[] s in data)
+            {
+                try
+                {
+                    dataGridView1.Rows.Add(s);
+                }
+                catch
+                {
+                    break;
+                }
+                
+            }
             
         }
 
-        private void button3_Click(object sender, EventArgs e) //Кнопка Обновить
+        public void button2_Click(object sender, EventArgs e) //добавленеие картинки
         {
-            
+            string fileName = file.openFile();
+            PiltBox.Image = Image.FromFile(set.GetResourcesFolder()+fileName);
+            PiltBox.Tag = fileName;
         }
     }
 }
